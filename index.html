@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema web de gestión de productos e inventario.">
+  <title>StockPro | Gestión de inventario</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <section id="auth-screen" class="auth-screen">
+    <form id="auth-form" class="auth-card">
+      <div class="brand-mark">S</div>
+      <p class="eyebrow">CONTROL DE INVENTARIO</p>
+      <h1>StockPro</h1>
+      <p class="muted">Gestioná tus productos desde cualquier dispositivo.</p>
+
+      <label for="auth-email">Correo electrónico</label>
+      <input id="auth-email" type="email" required autocomplete="email"
+        placeholder="nombre@empresa.com">
+
+      <label for="auth-password">Contraseña</label>
+      <input id="auth-password" type="password" required minlength="6"
+        autocomplete="current-password" placeholder="Mínimo 6 caracteres">
+
+      <button id="auth-submit" class="primary-btn" type="submit">Iniciar sesión</button>
+      <button id="signup-btn" class="secondary-btn" type="button">Crear cuenta</button>
+      <p id="auth-message" class="message" role="status"></p>
+    </form>
+  </section>
+
+  <div id="app-screen" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">S</div>
+        <div><strong>StockPro</strong><small>Inventory Manager</small></div>
+      </div>
+      <p class="nav-label">MENÚ PRINCIPAL</p>
+      <button class="nav-item active" data-view="dashboard">▦ <span>Resumen</span></button>
+      <button class="nav-item" data-view="products">▤ <span>Productos</span></button>
+      <button class="nav-item" data-view="movements">↔ <span>Movimientos</span></button>
+      <div class="sidebar-bottom">
+        <span class="status-dot"></span> Base de datos en la nube
+        <button id="logout-btn" class="secondary-btn">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PANEL DE CONTROL</p>
+          <h1 id="page-title">Resumen general</h1>
+        </div>
+        <div class="user-chip"><span class="status-dot"></span><span id="user-email"></span></div>
+      </header>
+
+      <p id="global-message" class="message" role="status"></p>
+
+      <section id="dashboard-view" class="view">
+        <div class="welcome-row">
+          <div><h2>Tu inventario, de un vistazo</h2>
+          <p class="muted">Indicadores actualizados desde la base de datos.</p></div>
+          <button class="primary-btn" id="new-product-top">+ Nuevo producto</button>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card"><span>Productos registrados</span><strong id="stat-products">0</strong><small>Referencias únicas</small></article>
+          <article class="stat-card"><span>Unidades disponibles</span><strong id="stat-units">0</strong><small>Stock total</small></article>
+          <article class="stat-card"><span>Stock bajo</span><strong id="stat-low">0</strong><small>Requieren revisión</small></article>
+          <article class="stat-card"><span>Valor del inventario</span><strong id="stat-value">$0</strong><small>Precio × existencias</small></article>
+        </div>
+        <section class="panel">
+          <div class="panel-heading"><div><h2>Productos con stock bajo</h2><p class="muted">Productos en el mínimo o por debajo.</p></div>
+          <button class="text-btn" data-go="products">Ver productos →</button></div>
+          <div id="low-stock-list"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><h2>Últimos movimientos</h2><p class="muted">Entradas y salidas recientes.</p></div>
+          <button class="text-btn" data-go="movements">Ver historial →</button></div>
+          <div id="recent-movements"></div>
+        </section>
+      </section>
+
+      <section id="products-view" class="view hidden">
+        <div class="toolbar">
+          <input id="search-products" type="search" placeholder="Buscar por nombre o código...">
+          <select id="category-filter"><option value="">Todas las categorías</option></select>
+          <button id="new-product-btn" class="primary-btn">+ Nuevo producto</button>
+        </div>
+
+        <section id="product-form-panel" class="panel hidden">
+          <div class="panel-heading"><h2 id="product-form-title">Nuevo producto</h2>
+            <button id="cancel-product" class="text-btn">Cancelar</button></div>
+          <form id="product-form" class="form-grid">
+            <input id="product-id" type="hidden">
+            <div><label for="product-code">Código / SKU *</label><input id="product-code" required maxlength="60"></div>
+            <div><label for="product-name">Nombre *</label><input id="product-name" required maxlength="120"></div>
+            <div><label for="product-category">Categoría *</label><input id="product-category" required maxlength="80" value="General"></div>
+            <div><label for="product-price">Precio unitario *</label><input id="product-price" type="number" min="0" step="0.01" required value="0"></div>
+            <div><label for="product-stock">Stock inicial *</label><input id="product-stock" type="number" min="0" step="1" required value="0"></div>
+            <div><label for="product-min-stock">Mínimo de stock *</label><input id="product-min-stock" type="number" min="0" step="1" required value="5"></div>
+            <div class="full-width"><label for="product-description">Descripción</label><textarea id="product-description" rows="2" maxlength="500"></textarea></div>
+            <div class="full-width"><button class="primary-btn" type="submit">Guardar producto</button></div>
+          </form>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="panel-heading"><div><h2>Catálogo de productos</h2><p id="product-count" class="muted">0 productos</p></div></div>
+          <div class="table-scroll"><table>
+            <thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="products-table"></tbody>
+          </table></div>
+          <p id="products-empty" class="empty-state">Todavía no hay productos registrados.</p>
+        </section>
+      </section>
+
+      <section id="movements-view" class="view hidden">
+        <section class="panel">
+          <div class="panel-heading"><div><h2>Registrar movimiento</h2><p class="muted">Cada movimiento actualiza el stock y queda registrado.</p></div></div>
+          <form id="movement-form" class="form-grid">
+            <div class="full-width"><label for="movement-product">Producto *</label><select id="movement-product" required></select></div>
+            <div><label for="movement-type">Tipo *</label><select id="movement-type"><option value="entrada">Entrada</option><option value="salida">Salida</option></select></div>
+            <div><label for="movement-quantity">Cantidad *</label><input id="movement-quantity" type="number" min="1" step="1" required></div>
+            <div class="full-width"><label for="movement-notes">Observaciones</label><input id="movement-notes" maxlength="300" placeholder="Ej.: compra a proveedor"></div>
+            <div class="full-width"><button class="primary-btn" type="submit">Registrar movimiento</button></div>
+          </form>
+        </section>
+        <section class="panel table-panel">
+          <div class="panel-heading"><div><h2>Historial de movimientos</h2><p class="muted">Registro cronológico del inventario.</p></div></div>
+          <div class="table-scroll"><table>
+            <thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Stock anterior</th><th>Stock nuevo</th><th>Observaciones</th></tr></thead>
+            <tbody id="movements-table"></tbody>
+          </table></div>
+          <p id="movements-empty" class="empty-state">Todavía no hay movimientos.</p>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="confirm-dialog" class="dialog-backdrop hidden">
+    <div class="dialog-card">
+      <h2>Eliminar producto</h2>
+      <p>Se eliminará el producto y su historial de movimientos. Esta acción no se puede deshacer.</p>
+      <div class="dialog-actions"><button id="cancel-delete" class="secondary-btn">Cancelar</button><button id="confirm-delete" class="danger-btn">Eliminar</button></div>
+    </div>
+  </div>
+</body>
+</html>
