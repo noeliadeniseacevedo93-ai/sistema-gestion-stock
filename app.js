@@ -10,7 +10,7 @@ const configValida =
   SUPABASE_URL.endsWith(".supabase.co") &&
   !SUPABASE_URL.includes("PEGAR_AQUI") &&
   SUPABASE_PUBLISHABLE_KEY.length > 0 &&
-  !SUPABASE_PUBLISHABLE_KEY.includes("PEGAR_AQUI");
+  !SUPABASE_PUBLISHABLE_KEY.includes("sb_publishable_");
 
 const db = configValida
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
