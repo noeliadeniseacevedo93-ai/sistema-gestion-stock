@@ -5,12 +5,14 @@
 const SUPABASE_URL = "https://xxqqvytzteekuccdqjsp.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_sgt91Q6efjlHrv9q15phMw_eIZqTLCx";
 
+
 const configValida =
   SUPABASE_URL.startsWith("https://") &&
   SUPABASE_URL.endsWith(".supabase.co") &&
   !SUPABASE_URL.includes("PEGAR_AQUI") &&
-  SUPABASE_PUBLISHABLE_KEY.length > 0 &&
-  !SUPABASE_PUBLISHABLE_KEY.includes("sb_publishable_");
+  SUPABASE_PUBLISHABLE_KEY.startsWith("sb_publishable_") &&
+  !SUPABASE_PUBLISHABLE_KEY.includes("PEGAR_AQUI");
+
 
 const db = configValida
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
