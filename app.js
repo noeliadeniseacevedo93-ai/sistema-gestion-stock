@@ -6,7 +6,7 @@ const SUPABASE_URL = "https://xxqqvytzteekuccdqjsp.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_sgt91Q6efjlHrv9q15phMw_eIZqTLCx";
 
 const configValida =
-  SUPABASE_URL.startsWith("https://xxqqvytzteekuccdqjsp") &&
+  SUPABASE_URL.startsWith("https://xxqqvytzteekuccdqjsp.supabase.co") &&
   SUPABASE_URL.endsWith(".supabase.co") &&
   !SUPABASE_URL.includes("PEGAR_AQUI") &&
   SUPABASE_PUBLISHABLE_KEY.length > 0 &&
