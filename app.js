@@ -2,7 +2,7 @@
 "use strict";
 
 // 1. CONFIGURACIÓN: reemplazá estos dos valores por los de TU proyecto.
-const SUPABASE_URL = "https://xxqqvytzteekuccdqjsp.supabase.co/rest/v1/";
+const SUPABASE_URL = "https://xxqqvytzteekuccdqjsp.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_sgt91Q6efjlHrv9q15phMw_eIZqTLCx";
 
 const configValida =
