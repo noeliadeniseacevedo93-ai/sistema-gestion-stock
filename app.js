@@ -2,8 +2,8 @@
 "use strict";
 
 // 1. CONFIGURACIÓN: reemplazá estos dos valores por los de TU proyecto.
-const SUPABASE_URL = "PEGAR_AQUI_LA_URL_DEL_PROYECTO";
-const SUPABASE_PUBLISHABLE_KEY = "PEGAR_AQUI_LA_CLAVE_PUBLICA";
+const SUPABASE_URL = "https://xxqqvytzteekuccdqjsp.supabase.co/rest/v1/";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_sgt91Q6efjlHrv9q15phMw_eIZqTLCx";
 
 const configValida =
   SUPABASE_URL.startsWith("https://") &&
